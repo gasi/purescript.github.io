@@ -151,7 +151,13 @@
     }
     .muted { color: var(--ink-mute); }
     .gold  { color: var(--accent); }
-    em.key { font-style: normal; color: var(--ink); border-bottom: 1px solid var(--accent); padding-bottom: 1px; }
+    em.key {
+      font-style: normal; color: var(--ink);
+      background: rgba(196,149,61,0.16);
+      padding: 1px 4px; margin: 0 -1px;
+      border-radius: 2px;
+      box-decoration-break: clone; -webkit-box-decoration-break: clone;
+    }
 
     /* rotating headline phrase */
     .rotor {
@@ -298,6 +304,7 @@
     .term__diag .sig { font-weight: 600; }
     .term__diag .hint { color: var(--ink-mute); display: block; margin-top: 3px; }
     .term__diag .ok-out { color: var(--ink-soft); }
+    .term__diag .diag-pre { margin: 0; font: inherit; white-space: pre; overflow-x: auto; }
 
     .term__status {
       display: flex; align-items: center; gap: 9px;
@@ -428,7 +435,7 @@
     .dial { border: 1px solid var(--hairline); border-radius: 9px; background: var(--bg-raised); padding: 30px; }
     .dial__label { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-mute); }
     .dial__track { position: relative; height: 10px; border-radius: 999px; background: linear-gradient(90deg, rgba(224,101,79,0.25), rgba(196,149,61,0.3), rgba(89,184,122,0.4)); margin: 30px 0 14px; }
-    .dial__knob { position: absolute; top: 50%; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); border: 3px solid var(--bg-raised); box-shadow: 0 0 0 1px var(--accent), 0 0 16px var(--accent); transform: translate(-50%,-50%); transition: left .5s cubic-bezier(.4,0,.2,1); pointer-events: none; }
+    .dial__knob { position: absolute; top: 50%; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); border: 3px solid var(--bg-raised); box-shadow: 0 0 0 1px var(--accent), 0 0 16px var(--accent); transform: translate(-50%,-50%); transition: left .15s ease-out; pointer-events: none; }
     .dial__track input[type="range"] { position: absolute; inset: -10px 0; width: 100%; height: 30px; opacity: 0; cursor: pointer; margin: 0; }
     .dial__ends { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-mute); white-space: nowrap; }
     .dial__readout { margin-top: 22px; font-family: var(--font-mono); font-size: 13px; color: var(--ink-soft); }
@@ -511,12 +518,12 @@
           </div>
         </div>
         <div class="hero__media">
-          <div class="term" role="img" aria-label="A compiler rejecting a String passed where an Email is required, then accepting the corrected code.">
+          <div class="term" role="img" aria-label="A compiler rejecting swapped order and customer IDs in a refund call, then accepting the corrected code.">
             <div class="term__bar">
               <span class="term__dot"></span>
               <span class="term__dot"></span>
               <span class="term__dot"></span>
-              <span class="term__name">Greeting.purs</span>
+              <span class="term__name">Refund.purs</span>
               <span class="term__name term__cmd">spago build</span>
             </div>
             <div class="term__body" id="shot-body"></div>
@@ -549,8 +556,8 @@
       <div class="why__grid">
         <div class="reveal">
           <p class="kicker">Why now</p>
-          <h2 class="h2">You write more code than ever — and read less of it.</h2>
-          <p class="lede">Types are no longer a nicety. They are how you trust output you didn’t read.</p>
+          <h2 class="h2">More code needs more review. The compiler reads every line.</h2>
+          <p class="lede">Types are no longer a nicety. They are a review of every line, on every build.</p>
         </div>
         <div class="why__beats reveal">
           <div class="beat">
@@ -564,14 +571,14 @@
             <span class="beat__n">02</span>
             <div>
               <p class="beat__t">The bottleneck has moved</p>
-              <p class="beat__d">Not writing code — trusting code you didn’t fully write or read.</p>
+              <p class="beat__d">Not writing code — reviewing it. Attention is now the scarcest resource — spend it on the business logic, not on mechanical errors.</p>
             </div>
           </div>
           <div class="beat">
             <span class="beat__n">03</span>
             <div>
-              <p class="beat__t">Types are how you trust it</p>
-              <p class="beat__d">At scale, the only thing that makes unread code safe is a type system that makes wrong programs impossible to express.</p>
+              <p class="beat__t">The compiler never tires</p>
+              <p class="beat__d">A sound type system checks every line of every build — and turns whole classes of mistakes into compile errors.</p>
             </div>
           </div>
         </div>
@@ -695,16 +702,16 @@
           <div class="dial">
             <div class="dial__label">How much lives in PureScript</div>
             <div class="dial__track">
-              <div class="dial__knob" id="dial-knob" style="left: 82%"></div>
-              <input type="range" min="0" max="100" value="82" id="dial-input" aria-label="Share of code written in PureScript">
+              <div class="dial__knob" id="dial-knob" style="left: 80%"></div>
+              <input type="range" min="0" max="100" step="20" value="80" id="dial-input" aria-label="Share of code written in PureScript">
             </div>
             <div class="dial__ends">
               <span>all JS · via FFI</span>
               <span>all PureScript</span>
             </div>
-            <div class="dial__readout" id="dial-readout"><b>82%</b> of your code proven by the compiler. Almost everything the compiler can prove, it does.</div>
+            <div class="dial__readout" id="dial-readout"><b>80%</b> of your code proven by the compiler. Almost everything the compiler can prove, it does.</div>
           </div>
-          <p class="pullquote">The more you keep in PureScript, the <span class="gold">more the compiler proves</span> for you.</p>
+          <p class="pullquote">The more you move to PureScript, the <span class="gold">more the compiler proves</span> for you.</p>
           <p class="muted power__aside">It’s a dial, not a cliff.</p>
         </div>
       </div>
@@ -818,14 +825,22 @@
         return tokens;
       }
 
-      /* Render highlighted code as HTML. `errs` = substrings to mark with an error squiggle. */
+      /* Render highlighted code as HTML. `errs` = substrings to mark with an error
+         squiggle — each may span several tokens (e.g. 'customer.id'). */
       function renderCode(code, errs) {
         errs = errs || [];
         var lines = String(code).replace(/\n$/, '').split('\n');
         var html = lines.map(function (line) {
-          var spans = tokenizeLine(line).map(function (token) {
-            var isErr = errs.some(function (e) { return token.v === e; });
-            var cls = isErr ? token.c + ' tok-err' : token.c;
+          var tokens = tokenizeLine(line);
+          errs.forEach(function (err) {
+            for (var i = 0; i < tokens.length; i++) {
+              var run = '', j = i;
+              while (j < tokens.length && run.length < err.length) { run += tokens[j].v; j++; }
+              if (run === err) { for (var k = i; k < j; k++) tokens[k].isErr = true; }
+            }
+          });
+          var spans = tokens.map(function (token) {
+            var cls = token.isErr ? token.c + ' tok-err' : token.c;
             return '<span class="' + cls + '">' + escapeHtml(token.v) + '</span>';
           }).join('');
           return '<span class="ln">' + spans + '\n</span>';
@@ -833,37 +848,48 @@
         return '<pre class="code">' + html + '</pre>';
       }
 
-      /* ---------- Hero money shot: error → compiling → ok → loop ---------- */
+      /* ---------- Hero money shot: error → compiling → ok → loop ----------
+         Verified against the real compiler (compile.purescript.org): the broken
+         call yields exactly one TypesDoNotUnify error at `customer.id`. */
       var BROKEN =
-        'greet :: Email -> String\n' +
-        'greet email = "Hello, " <> show email\n' +
+        'refund :: OrderId -> CustomerId -> Money\n' +
+        '       -> Effect Unit\n' +
         '\n' +
         'main :: Effect Unit\n' +
-        'main = log (greet "ada@example.com")';
+        'main = refund customer.id order.id fee';
 
       var FIXED =
-        'greet :: Email -> String\n' +
-        'greet email = "Hello, " <> show email\n' +
+        'refund :: OrderId -> CustomerId -> Money\n' +
+        '       -> Effect Unit\n' +
         '\n' +
         'main :: Effect Unit\n' +
-        'main = case mkEmail "ada@example.com" of\n' +
-        '  Right addr -> log (greet addr)\n' +
-        '  Left  err  -> log err';
+        'main = refund order.id customer.id fee';
 
       var shotBody = document.getElementById('shot-body');
       var shotDiag = document.getElementById('shot-diag');
       var shotStatus = document.getElementById('shot-status');
       var shotStatusText = document.getElementById('shot-status-text');
 
+      /* Verbatim `spago build` / `spago run` output (spago 1.0.4, purs 0.15.16);
+         the middle "while checking…" chain is elided with "…" for space. */
       var ERROR_DIAG =
-        '<span class="sig">✕  Could not match type String with type Email</span>' +
-        '<span class="hint">in the first argument to ‘greet’ — a raw string is not a validated address.</span>';
-      var OK_DIAG = '<span class="ok-out">&gt; Hello, ada@example.com</span>';
+        '<pre class="diag-pre">' +
+        '[ERROR 1/1 TypesDoNotUnify] src/Refund.purs:26:15\n' +
+        '\n' +
+        '  Could not match type\n' +
+        '    CustomerId\n' +
+        '  with type\n' +
+        '    OrderId\n' +
+        '  …\n' +
+        '  while checking type of property accessor customer.id\n' +
+        '  in value declaration main</pre>';
+      var OK_DIAG = '<span class="ok-out">&gt; refunded #1042 — $39.00</span>';
 
       function renderShot(phase) {
         var isError = phase === 'error';
+        /* spago's caret spans only `customer` (26:15–23) — match it exactly */
         shotBody.innerHTML = renderCode(isError ? BROKEN : FIXED,
-          isError ? ['"ada@example.com"'] : []);
+          isError ? ['customer'] : []);
 
         shotDiag.className = 'term__diag' + (isError ? ' is-err' : phase === 'ok' ? ' is-ok' : '');
         shotDiag.innerHTML = isError ? ERROR_DIAG : phase === 'ok' ? OK_DIAG : '&nbsp;';
@@ -872,8 +898,8 @@
           (isError ? ' is-err' : phase === 'ok' ? ' is-ok' : '');
         shotStatus.firstElementChild.className = 'sdot' + (phase === 'compiling' ? ' spin' : '');
         shotStatusText.textContent =
-          isError ? 'build failed — 1 error' :
-          phase === 'compiling' ? 'compiling…' : 'compiled — 0 errors';
+          isError ? '✘ Failed to build.' :
+          phase === 'compiling' ? 'Compiling Refund' : '✓ Build succeeded.';
       }
 
       if (prefersReduced) {
@@ -896,9 +922,8 @@
       var HEAD_PHRASES = [
         'your whole stack.',
         'your agents.',
-        'the code you didn’t write.',
-        'everything you ship.',
-        'code you can’t read.'
+        'code at machine speed.',
+        'every line you ship.'
       ];
       if (!prefersReduced) {
         var rotor = document.getElementById('rotor');
@@ -984,16 +1009,19 @@
       var dialKnob = document.getElementById('dial-knob');
       var dialReadout = document.getElementById('dial-readout');
 
-      function dialMessage(value) {
-        if (value < 40) return 'A safe floor — and room to climb.';
-        if (value < 80) return 'More guarantees with every line you move in.';
-        return 'Almost everything the compiler can prove, it does.';
-      }
+      var DIAL_MESSAGES = {
+        0:   'Day one: all JavaScript — and every path forward open.',
+        20:  'A safe floor — and room to climb.',
+        40:  'The core of your domain, compiler-checked.',
+        60:  'More guarantees with every line you move in.',
+        80:  'Almost everything the compiler can prove, it does.',
+        100: 'Nothing unchecked.'
+      };
 
       dialInput.addEventListener('input', function () {
         var value = Number(dialInput.value);
         dialKnob.style.left = value + '%';
-        dialReadout.innerHTML = '<b>' + value + '%</b> of your code proven by the compiler. ' + dialMessage(value);
+        dialReadout.innerHTML = '<b>' + value + '%</b> of your code proven by the compiler. ' + DIAL_MESSAGES[value];
       });
 
       /* ---------- Reveal on scroll ---------- */
