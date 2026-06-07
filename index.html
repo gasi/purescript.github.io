@@ -480,9 +480,14 @@
     /* reveal on scroll (only hidden when JS is running) */
     .js .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s ease; }
     .js .reveal.in { opacity: 1; transform: none; }
+    /* Reduced motion: state changes still happen (the page's story depends on
+       them) but as instant swaps — no transforms, spins, or slides. */
     @media (prefers-reduced-motion: reduce) {
       .js .reveal { opacity: 1; transform: none; transition: none; }
       html { scroll-behavior: auto; }
+      .term__status .spin { animation: none; }
+      .dial__knob { transition: none; }
+      .btn .arrow, .btn:hover .arrow { transition: none; transform: none; }
     }
   </style>
 </head>
@@ -793,9 +798,6 @@
 
       document.documentElement.classList.add('js');
 
-      var prefersReduced = window.matchMedia &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
       /* ---------- PureScript syntax highlighter ---------- */
       var KEYWORDS = {};
       ['import', 'module', 'where', 'data', 'type', 'newtype', 'class', 'instance',
@@ -902,21 +904,17 @@
           phase === 'compiling' ? 'Compiling Refund' : '✓ Build succeeded.';
       }
 
-      if (prefersReduced) {
-        renderShot('ok');
-      } else {
-        var SHOT_NEXT = { error: 'compiling', compiling: 'ok', ok: 'error' };
-        var SHOT_DURATION = { error: 3000, compiling: 1100, ok: 3400 };
-        var shotPhase = 'error';
-        renderShot(shotPhase);
-        (function tick() {
-          setTimeout(function () {
-            shotPhase = SHOT_NEXT[shotPhase];
-            renderShot(shotPhase);
-            tick();
-          }, SHOT_DURATION[shotPhase]);
-        })();
-      }
+      var SHOT_NEXT = { error: 'compiling', compiling: 'ok', ok: 'error' };
+      var SHOT_DURATION = { error: 3000, compiling: 1100, ok: 3400 };
+      var shotPhase = 'error';
+      renderShot(shotPhase);
+      (function tick() {
+        setTimeout(function () {
+          shotPhase = SHOT_NEXT[shotPhase];
+          renderShot(shotPhase);
+          tick();
+        }, SHOT_DURATION[shotPhase]);
+      })();
 
       /* ---------- Rotating headline ---------- */
       var HEAD_PHRASES = [
@@ -925,19 +923,17 @@
         'code at machine speed.',
         'every line you ship.'
       ];
-      if (!prefersReduced) {
-        var rotor = document.getElementById('rotor');
-        var phraseIndex = 0;
-        setInterval(function () {
-          phraseIndex = (phraseIndex + 1) % HEAD_PHRASES.length;
-          var next = document.createElement('span');
-          next.className = 'rotor';
-          next.id = 'rotor';
-          next.textContent = HEAD_PHRASES[phraseIndex];
-          rotor.replaceWith(next);
-          rotor = next;
-        }, 2700);
-      }
+      var rotor = document.getElementById('rotor');
+      var phraseIndex = 0;
+      setInterval(function () {
+        phraseIndex = (phraseIndex + 1) % HEAD_PHRASES.length;
+        var next = document.createElement('span');
+        next.className = 'rotor';
+        next.id = 'rotor';
+        next.textContent = HEAD_PHRASES[phraseIndex];
+        rotor.replaceWith(next);
+        rotor = next;
+      }, 2700);
 
       /* ---------- Section 3: before/after transform ---------- */
       var SIG_BEFORE =
@@ -973,13 +969,13 @@
         tabAfter.setAttribute('aria-pressed', String(!isBefore));
       }
 
-      var sigView = prefersReduced ? 'after' : 'before';
+      var sigView = 'before';
       var sigPinned = false;
       var sigTimer = null;
       renderSignature(sigView);
 
       function scheduleSignatureFlip() {
-        if (sigPinned || prefersReduced) return;
+        if (sigPinned) return;
         sigTimer = setTimeout(function () {
           sigView = sigView === 'before' ? 'after' : 'before';
           renderSignature(sigView);
