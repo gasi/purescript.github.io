@@ -7,7 +7,7 @@
   <title>PureScript · Types that tell the truth — front to back</title>
   <meta name="description" content="PureScript is a strongly-typed, purely functional programming language that compiles to JavaScript. Types that tell the truth — front to back.">
 
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Roboto+Flex:opsz,slnt,wdth,wght,GRAD,XOPQ,XTRA,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC@8..144,-10..0,25..151,100..1000,-200..150,27..175,323..603,25..135,649..854,-305..-98,560..788,416..570,528..760&display=swap">
 
   <link rel="icon" type="image/png" href="img/favicon_clear-16.png" sizes="16x16">
   <link rel="icon" type="image/png" href="img/favicon_clear-32.png" sizes="32x32">
@@ -59,9 +59,11 @@
       --c-err:   #e0654f;
 
       /* typography */
-      --font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      --font-mono: 'Roboto Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-      --display-weight: 300;
+      --font-sans: 'Roboto Flex', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      /* local serif stack for longer running text — no web download */
+      --font-serif: 'Iowan Old Style', 'Charter', 'Bitstream Charter', 'Palatino Linotype', Palatino, 'Sitka Text', Cambria, Georgia, ui-serif, serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+      --display-weight: 440;
       --display-track:  -0.015em;
 
       --maxw: 1180px;
@@ -81,6 +83,17 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
+
+      /* Roboto Flex axes — registered axes via their CSS properties so
+         per-element weight/width overrides still apply; the rest via
+         font-variation-settings (inherited as one value). */
+      font-weight: 400;
+      font-stretch: 121.8%;
+      font-style: normal;
+      font-optical-sizing: auto;
+      font-variation-settings:
+        "GRAD" 40, "XOPQ" 104, "XTRA" 468, "YOPQ" 79,
+        "YTAS" 754, "YTDE" -227, "YTFI" 673, "YTLC" 539, "YTUC" 679;
     }
 
     /* subtle grid texture — the instrument-panel backdrop, very faint */
@@ -144,8 +157,9 @@
       text-wrap: balance;
     }
     .lede {
-      font-size: clamp(1.05rem, 1.7vw, 1.3rem);
-      line-height: 1.55;
+      font-family: var(--font-serif);
+      font-size: clamp(1.1rem, 1.75vw, 1.36rem);
+      line-height: 1.6;
       color: var(--ink-soft);
       max-width: 60ch;
       text-wrap: pretty;
@@ -160,18 +174,48 @@
       box-decoration-break: clone; -webkit-box-decoration-break: clone;
     }
 
-    /* rotating headline phrase */
+    /* rotating headline phrase — real metallic gold, gently sweeping */
     .rotor {
       display: inline-block;
-      color: var(--accent);
-      will-change: transform, opacity;
+      /* pad vertically so the clipped gradient covers full ascender/descender
+         height (no cut-off on y/g/p); negative margin keeps layout unchanged */
+      padding: 0.1em 0.04em 0.2em;
+      margin: -0.1em -0.04em -0.2em;
+      background: linear-gradient(
+        100deg,
+        #6e4a14 0%,
+        #93701f 16%,
+        #b58c33 32%,
+        #d8ad52 47%,
+        #e6c069 50%,
+        #d8ad52 53%,
+        #b58c33 68%,
+        #93701f 84%,
+        #6e4a14 100%
+      );
+      background-size: 250% auto;
+      background-position: 0% center;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      will-change: transform, opacity, background-position;
     }
     @media (prefers-reduced-motion: no-preference) {
-      .rotor { animation: rotorIn 0.55s cubic-bezier(0.16, 0.84, 0.3, 1) both; }
+      .rotor {
+        animation:
+          rotorIn 0.55s cubic-bezier(0.16, 0.84, 0.3, 1) both,
+          goldSweep 6s ease-in-out infinite;
+      }
     }
     @keyframes rotorIn {
       from { opacity: 0; transform: translateY(0.42em); clip-path: inset(0 0 -10% 0); }
       to   { opacity: 1; transform: none; }
+    }
+    @keyframes goldSweep {
+      0%   { background-position: 0% center; }
+      50%  { background-position: 100% center; }
+      100% { background-position: 0% center; }
     }
 
     a { color: var(--accent); text-decoration: none; }
@@ -180,7 +224,7 @@
     /* ---- buttons (dark-tuned, square brand) ---- */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-      font-family: var(--font-sans); font-size: 0.84rem; font-weight: 400;
+      font-family: var(--font-sans); font-size: 0.84rem; font-weight: 700;
       text-transform: uppercase; letter-spacing: 0.07em;
       padding: 14px 26px; border-radius: 3px; border: 1px solid transparent;
       cursor: pointer; white-space: nowrap; text-decoration: none;
@@ -250,7 +294,8 @@
       align-items: center;
     }
     .hero__cta { display: flex; gap: 14px; margin-top: 36px; flex-wrap: wrap; }
-    .hero__sub { margin-top: 26px; }
+    /* hero subhead stays sans — the serif lede treatment is for running body copy below */
+    .hero__sub { margin-top: 26px; font-family: var(--font-sans); }
     /* reserve headline height so rotating phrases of different lengths don't shift the layout */
     .hero .display { min-height: 3.15em; }
     @media (max-width: 900px) { .hero .display { min-height: 0; } }
@@ -667,7 +712,7 @@
       <div class="sec__head reveal">
         <p class="kicker">The concrete heart</p>
         <h2 class="h2">Make illegal states unrepresentable.</h2>
-        <p class="lede">Stop passing <code class="tok-id">String</code> and <code class="tok-id">Number</code> around. Your domain isn’t made of primitives — it’s made of Money, Email, SKU, distances in meters. Encode each constraint in a type once, and the compiler enforces it everywhere.</p>
+        <p class="lede">Stop passing <code class="tok-id">String</code> and <code class="tok-id">Number</code> around. Your domain isn’t made of primitives — it’s made of <code class="tok-id">Money</code>, <code class="tok-id">Email</code>, <code class="tok-id">SKU</code>, distances in meters. Encode each constraint in a type once, and the compiler enforces it everywhere.</p>
       </div>
       <div class="illegal__stage reveal">
         <div class="sig-panel">
