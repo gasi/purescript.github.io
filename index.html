@@ -972,6 +972,26 @@
           phase === 'compiling' ? 'Compiling Refund' : '✓ Build succeeded.';
       }
 
+      /* Reserve the diagnostic region at its tallest (the error) height so
+         cycling phases never resize the panel — no layout shift, esp. on
+         mobile. Measured off an offscreen clone so it's font-accurate and
+         survives copy edits; re-run after fonts load. */
+      function lockDiagHeight() {
+        shotDiag.style.minHeight = '';
+        var clone = shotDiag.cloneNode(false);
+        clone.className = 'term__diag is-err';
+        clone.style.cssText = 'position:absolute; visibility:hidden; min-height:0; ' +
+          'width:' + shotDiag.offsetWidth + 'px';
+        clone.innerHTML = ERROR_DIAG;
+        shotDiag.parentNode.appendChild(clone);
+        var h = clone.offsetHeight;
+        clone.remove();
+        if (h) shotDiag.style.minHeight = h + 'px';
+      }
+      lockDiagHeight();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(lockDiagHeight);
+      window.addEventListener('resize', lockDiagHeight);
+
       var SHOT_NEXT = { error: 'compiling', compiling: 'ok', ok: 'error' };
       var SHOT_DURATION = { error: 3000, compiling: 1100, ok: 3400 };
       var shotPhase = 'error';
