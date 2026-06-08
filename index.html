@@ -1032,18 +1032,12 @@
       /* ---------- Section 3: before/after transform ---------- */
       var SIG_BEFORE =
         '-- everything is a primitive; nothing stops a mistake\n' +
-        'transfer\n' +
-        '  :: String -> String\n' +
-        '  -> Number -> String\n' +
-        '  -> Boolean\n' +
+        'transfer :: String -> String -> Number -> String -> Boolean\n' +
         'transfer from to amount currency = ...';
 
       var SIG_AFTER =
         '-- each constraint encoded once, enforced everywhere\n' +
-        'transfer\n' +
-        '  :: AccountId -> AccountId\n' +
-        '  -> Money\n' +
-        '  -> Result Transfer\n' +
+        'transfer :: FromAccountId -> ToAccountId -> AmountUSD -> Result Transfer\n' +
         'transfer from to amount = ...';
 
       var sigBody = document.getElementById('sig-body');
@@ -1058,7 +1052,7 @@
         sigDiag.className = isBefore ? 'term__diag is-err' : 'term__diag is-ok';
         sigDiag.innerHTML = isBefore
           ? '<span>Four interchangeable arguments. Swap two and it still compiles.</span>'
-          : '<span class="ok-out">Mis-order the arguments and it won’t build. Money carries its own currency.</span>';
+          : '<span class="ok-out">Mis-order the arguments and it won’t build. The amount’s currency lives in its type.</span>';
         tabBefore.setAttribute('aria-pressed', String(isBefore));
         tabAfter.setAttribute('aria-pressed', String(!isBefore));
       }
