@@ -118,8 +118,9 @@
       display: flex; align-items: center; gap: 12px;
     }
     .kicker::before {
-      content: "";
-      width: 22px; height: 1px; background: var(--accent); opacity: 0.7;
+      content: "--";
+      letter-spacing: normal;
+      opacity: 0.7;
     }
 
     h1, h2, h3 { color: var(--ink); font-weight: var(--display-weight); margin: 0; }
@@ -210,6 +211,24 @@
     }
     .nav__logo { display: flex; align-items: center; }
     .nav__logo img { height: 26px; width: auto; display: block; }
+    /* with JS, the nav logo is an empty docking slot; the morph element renders the logo */
+    .js .nav__logo { width: 129px; height: 26px; }
+    .js .nav__logo img { display: none; }
+
+    /* ---- hero logo that docks into the nav on scroll ---- */
+    .logo-morph {
+      position: fixed; top: 0; left: 0; z-index: 60;
+      transform-origin: 0 0; will-change: transform;
+      display: block;
+    }
+    .logo-morph img { display: block; height: 100%; width: auto; }
+    html:not(.js) .logo-morph, html:not(.js) .hero__logo-slot { display: none; }
+    .hero__logo-slot {
+      display: block;
+      height: clamp(40px, 6vw, 64px);
+      aspect-ratio: 319.84 / 64.684;   /* official logo viewBox */
+      margin-bottom: 34px;
+    }
     .nav__links { display: flex; gap: 30px; margin-left: auto; }
     .nav__link {
       font-size: 0.86rem; color: var(--ink-mute); letter-spacing: 0.01em;
@@ -235,16 +254,14 @@
     /* reserve headline height so rotating phrases of different lengths don't shift the layout */
     .hero .display { min-height: 3.15em; }
     @media (max-width: 900px) { .hero .display { min-height: 0; } }
+    /* eyebrow as a PureScript doc comment — code as brand */
     .hero__eyebrow {
-      display: inline-flex; align-items: center; gap: 10px;
-      font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.04em;
-      color: var(--ink-mute); border: 1px solid var(--hairline);
-      background: rgba(255,255,255,0.02);
-      padding: 7px 14px; border-radius: 999px; margin-bottom: 30px;
-      white-space: nowrap; max-width: 100%;
+      display: block;
+      font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.02em;
+      color: var(--ink-soft);
+      margin-bottom: 30px;
     }
-    .hero__eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); flex: none; }
-    @media (max-width: 400px) { .hero__eyebrow { white-space: normal; border-radius: 16px; } }
+    .hero__eyebrow .marker { color: var(--accent); }
 
     @media (max-width: 900px) {
       .hero__grid { grid-template-columns: 1fr; gap: 40px; }
@@ -495,7 +512,7 @@
 <body>
   <nav class="nav">
     <div class="nav__inner">
-      <a href="#top" class="nav__logo" aria-label="PureScript">
+      <a href="#top" class="nav__logo" id="nav-logo-slot" aria-label="PureScript">
         <img src="img/logo.svg" alt="PureScript">
       </a>
       <div class="nav__links">
@@ -509,12 +526,18 @@
     </div>
   </nav>
 
+  <!-- single logo element, morphed between the hero slot and the nav slot -->
+  <a href="#top" class="logo-morph" id="logo-morph" aria-label="PureScript" style="visibility: hidden">
+    <img src="img/logo.svg" alt="">
+  </a>
+
   <!-- =================== HERO =================== -->
   <header class="hero" id="top">
     <div class="wrap">
       <div class="hero__grid">
         <div class="hero__copy">
-          <span class="hero__eyebrow"><span class="dot"></span>The verification layer for the AI era</span>
+          <span class="hero__logo-slot" id="hero-logo-slot" aria-hidden="true"></span>
+          <span class="hero__eyebrow"><span class="marker">--&nbsp;|</span> The verification layer for the AI era</span>
           <h1 class="display">Trust<br><span class="rotor" id="rotor">your whole stack.</span></h1>
           <p class="lede hero__sub">A purely functional language that compiles to JavaScript, with types that tell the truth — front to back. When AI writes more of your code than ever, <em class="key">a compiler that refuses to build the wrong thing</em> is your safety net.</p>
           <div class="hero__cta">
@@ -915,6 +938,52 @@
           tick();
         }, SHOT_DURATION[shotPhase]);
       })();
+
+      /* ---------- Hero logo morphs into the sticky nav ---------- */
+      var morph = document.getElementById('logo-morph');
+      var morphHeroSlot = document.getElementById('hero-logo-slot');
+      var morphNavSlot = document.getElementById('nav-logo-slot');
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      var morphDist = 1, heroDocTop = 0, heroDocLeft = 0, heroHeight = 1, navSlotRect = null;
+
+      function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      function placeMorph() {
+        var p = Math.min(1, Math.max(0, window.scrollY / morphDist));
+        /* reduced motion: ride with the content, then snap into the nav — no drift */
+        var eased = reduceMotion.matches ? (p >= 1 ? 1 : 0) : easeInOutCubic(p);
+        var heroTopInViewport = heroDocTop - window.scrollY;
+        var x = heroDocLeft + (navSlotRect.left - heroDocLeft) * eased;
+        var y = heroTopInViewport + (navSlotRect.top - heroTopInViewport) * eased;
+        var scale = 1 + (navSlotRect.height / heroHeight - 1) * eased;
+        morph.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0) scale(' + scale + ')';
+        morph.style.visibility = 'visible';
+      }
+
+      function measureMorph() {
+        var heroRect = morphHeroSlot.getBoundingClientRect();
+        navSlotRect = morphNavSlot.getBoundingClientRect();
+        heroDocTop = heroRect.top + window.scrollY;
+        heroDocLeft = heroRect.left;
+        heroHeight = heroRect.height;
+        morphDist = Math.max(1, heroDocTop - navSlotRect.top);
+        morph.style.height = heroHeight + 'px';
+        morph.style.width = heroRect.width + 'px';
+        placeMorph();
+      }
+
+      var morphQueued = false;
+      window.addEventListener('scroll', function () {
+        if (morphQueued) return;
+        morphQueued = true;
+        requestAnimationFrame(function () { morphQueued = false; placeMorph(); });
+      }, { passive: true });
+      window.addEventListener('resize', measureMorph);
+      window.addEventListener('load', measureMorph);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureMorph);
+      measureMorph();
 
       /* ---------- Rotating headline ---------- */
       var HEAD_PHRASES = [
